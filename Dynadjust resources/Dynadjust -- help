@@ -1,0 +1,528 @@
+C:\Users\likdw00>dynadjust --help
++---------------------------------------------------------------------------
++ Title:        dynadjust - DynAdjust 2022.
++ Description:  Geodetic network adjustment software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:01:07 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ dynadjust usage:  dynadjust  [options]:
+
++ Standard options:
+  -p [ --project-file ] arg  Project file containing all user options for import, segment, geoid,
+                             reftran, adjust and plot.
+  -n [ --network-name ] arg  Network name. User defined name for all input and output files.
+                             Default is "network#".
+  --import                   Run import - DynAdjust file exchange software.
+  --geoid                    Run geoid - geoid model interpolation software to determine
+                             geoid-ellipsoid separation and deflection values.
+  --reftran                  Run reftran - reference frame transformation software to transform
+                             stations and measurements.
+  --segment                  Run segment - automated segmentation software to partition a geodetic
+                             network into smaller sized blocks.
+  --adjust                   Run adjust - geodetic network adjustment software.
+
++ Generic options:
+  --verbose-level arg        Give detailed information about what dynadjust is doing.
+                               0: No information (default)
+                               1: Helpful information
+                               2: Extended information
+                               3: Debug level information
+  --quiet                    Suppresses all explanation of what dynadjust is doing unless an error
+                             occurs.
+  -v [ --version ]           Display the current program version.
+  -h [ --help ]              Show this help message.
+  --help-module arg          Provide help for a specific help category.
+
+
+C:\Users\likdw00>import --help
++---------------------------------------------------------------------------
++ Title:        import - DynAdjust 2022.
++ Description:  File import and format exchange software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:01:53 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ import usage:  import [options] [files]...:
+
++ Standard options:
+  -p [ --project-file ] arg      Project file name. Full path to project file. If none specified, a
+                                 new file is created using input-folder and network-name.  If a
+                                 project file exists, the file is used to set all command line
+                                 options.
+  -n [ --network-name ] arg      Network name. User defined name for all input and output files.
+                                 Default is "network#", where # is incremented until the first
+                                 available network is reached.
+  -f [ --stn-msr-file ] arg      Station and measurement input file(s). Switch is not required.
+  -g [ --geo-file ] arg          Import DNA geoid file.
+  -i [ --input-folder ] arg      Path containing all input files.
+  -o [ --output-folder ] arg     Path for all output files.
+  -s [ --binary-stn-file ] arg   Binary station output file name. Overrides network name.
+  -m [ --binary-msr-file ] arg   Binary measurement output file name. Overrides network name.
+
++ Reference frame options:
+  -r [ --reference-frame ] arg   Default reference frame for all stations and measurements, and for
+                                 preliminary reductions on the ellipsoid when input files do not
+                                 specify a reference frame. Default is GDA2020.
+  --override-input-ref-frame     Override the reference frame specified for each measurement in
+                                 input files.
+
++ Data screening options:
+  --bounding-box arg             Import stations and measurements within bounding box. arg is a
+                                 comma delimited string "lat1,lon1,lat2,lon2" (in dd.mmss) defining
+                                 the upper-left and lower-right limits.
+  --get-msrs-transcending-box    Include measurements which transcend bounding box, including
+                                 associated stations.
+  --include-stns-assoc-msrs arg  Include stations and all associated measurements. arg is a comma
+                                 delimited string "stn 1,stn 2,stn 3,...,stn N" of the stations to
+                                 include.
+  --exclude-stns-assoc-msrs arg  Exclude stations and all associated measurements. arg is a comma
+                                 delimited string "stn 1,stn 2,stn 3,...,stn N" of the stations to
+                                 exclude.
+  --split-gnss-cluster-msrs      Allow bounding-box or get-stns-and-assoc-msrs to split GNSS point
+                                 and baseline cluster measurements.
+  --import-block-stn-msr arg     Extract stations and measurements from this block.
+  --seg-file arg                 Network segmentation input file. Filename overrides network name.
+  --prefer-single-x-as-g         Import single baseline cluster measurements (X) as single
+                                 baselines (G).
+  --include-msr-types arg        Import the specified measurement types. arg is a non-delimited
+                                 string of measurement types (eg "GXY").
+  --exclude-msr-types arg        Exclude the specified measurement types. arg is a non-delimited
+                                 string of measurement typs (eg "IJK").
+  --stn-renaming-file arg        Station renaming file
+  --discontinuity-file arg       Station discontinuity file.  Applies discontinuity dates to
+                                 station names in station and measurement files.
+  --search-nearby-stn            Search for nearby stations.
+  --nearby-stn-buffer arg        Specify the radius of the circle within which to search for nearby
+                                 stations.  Default is 0.3m
+  --search-similar-gnss-msr      Search and provide warnings for GNSS baselines (G) and baseline
+                                 clusters (X) which appear to have been derived from the same
+                                 source data.
+  --search-similar-msr           Search and provide warnings for similar measurements.
+  --ignore-similar-msr           Ignore similar measurements.
+  --remove-ignored-msr           Remove ignored measurements.
+  --flag-unused-stations         Mark unused stations in binary file.  Stations marked will be
+                                 excluded from any further processing.
+  --test-integrity               Test the integrity of the association lists and binary files.
+
++ GNSS variance matrix scaling options:
+  --v-scale arg                  Global variance (v) matrix scalar for all GNSS measurements.
+                                 Replaces existing scalar.  Default is 1.
+  --p-scale arg                  Latitude (p=phi) variance matrix scalar for all GNSS measurements.
+                                   Replaces existing scalar.  Default is 1.
+  --l-scale arg                  Longitude (l=lambda) variance matrix scalar for all GNSS
+                                 measurements.  Replaces existing scalar.  Default is 1.
+  --h-scale arg                  Height (h) variance matrix scalar for all GNSS measurements.
+                                 Replaces existing scalar.  Default is 1.
+  --baseline-scalar-file arg     File containing v, p, l and h scalars for GNSS baseline
+                                 measurements between specific station pairs.  Scalar file values
+                                 do not apply to GNSS point or baseline clusters.
+
++ Network simulation options:
+  --simulate-msr-file            Simulate exact measurements corresponding to the input
+                                 measurements using the coordinates in the station file. To apply
+                                 geoid--ellipsoid separations and deflections of the vertical to
+                                 the simulated measurements, introduce a geoid file using the
+                                 --geo-file option.
+
++ Output options:
+  --output-msr-to-stn            Output summary of measurements connected to each station.
+  --sort-msr-to-stn-field arg    Sort order for measurement to stations summary.
+                                   0: Original station order (default)
+                                   1: Measurement count
+
++ Export options:
+  --export-xml-files             Export stations and measurements to DynaML (DynAdjust XML) format.
+  --single-xml-file              Create a single DynaML file for stations and measurements.
+  --export-dna-files             Export stations and measurements to DNA STN and MSR format.
+  --export-asl-file              Export the ASL file as raw text.
+  --export-aml-file              Export the AML file as raw text.
+  --export-map-file              Export the MAP file as raw text.
+  --export-discont-file          Export discontinuity information as raw text.
+
++ Generic options:
+  --verbose-level arg            Give detailed information about what import is doing.
+                                   0: No information (default)
+                                   1: Helpful information
+                                   2: Extended information
+                                   3: Debug level information
+  --quiet                        Suppresses all explanation of what import is doing unless an error
+                                 occurs.
+  -v [ --version ]               Display the current program version.
+  -h [ --help ]                  Show this help message.
+  --help-module arg              Provide help for a specific help category.
+
+
+C:\Users\likdw00>geoid  --help
++---------------------------------------------------------------------------
++ Title:        geoid - DynAdjust 2022.
++ Description:  Geoid grid file interpolation software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:01:51 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ geoid usage:  geoid [options]:
+
++ Standard options:
+  -p [ --project-file ] arg          Project file name. Full path to project file. If none
+                                     specified, a new file is created using input-folder and
+                                     network-name.
+  -n [ --network-name ] arg          Network name. If [network-name].bst exists, all records within
+                                     the binary station file will be populated with N value and
+                                     deflections of the vertical.
+  -i [ --input-folder ] arg          Path containing all input files.
+  -o [ --output-folder ] arg         Path for all output files.
+
++ Interpolation options:
+  -e [ --interactive ]               Interpolate geoid information using coordinates provided on
+                                     the command line.
+  -t [ --text-file ] arg             Interpolate geoid information using coordinates contained in a
+                                     text file. arg is the path of the input text file. The
+                                     supported text file formats include formatted text (*.txt) and
+                                     comma separated values (*.csv) files. Refer to the User's
+                                     Guide for file format information.
+  -m [ --interpolation-method ] arg  Interpolation method.
+                                       0  Bi-linear
+                                       1  Bi-cubic (default)
+  --convert-stn-hts                  DEPRECATED. If a user-supplied height in the binary file is
+                                     orthometric, the height will be converted to ellipsoidal
+                                     automatically.
+  --decimal-degrees                  Specify input coordinates in decimal degrees (dd.dddddd).
+                                     Default is degrees, minutes and seconds (dd.mmssss).
+  -c [ --create-ntv2 ]               Create NTv2 grid file from standard DAT file.
+  -g [ --ntv2-file ] arg             Full file path of the NTv2 grid file.
+  -u [ --summary ]                   Print a summary of the grid file.
+
++ NTv2 creation options:
+  -d [ --dat-file ] arg              File path of the WINTER DAT grid file.
+  --grid-shift-type arg              Units in which the grid parameters and deflections of the
+                                     vertical will be stored. arg is either 'seconds' or 'radians'.
+                                     Default is seconds.
+  --grid-version arg                 Grid file version. Default is 1.0.0.0.
+  --system-from arg                  The 'From' reference system. Default is GDA94.
+  --system-to arg                    The 'To' reference system. Default is AHD_1971
+  --semi-major-from arg              Semi major of 'From' system. Default is 6378137.000
+  --semi-major-to arg                Semi major of 'To' system. Default is 6378137.000
+  --semi-minor-from arg              Semi minor of 'From' system. Default is 6356752.314
+  --semi-minor-to arg                Semi minor of 'To' system. Default is 6356752.314
+  --sub-grid-name arg                The name of the sub-grid. Default is AUSGEOID
+  --creation-date arg                Date of geoid model creation. arg is a dot delimited string
+                                     "dd.mm.yyyy". Default is today's date if no value is supplied.
+  --update-date arg                  Date of last file update. arg is a dot delimited string
+                                     "dd.mm.yyyy". Default is today's date if no value is supplied.
+
++ Interactive interpolation options:
+  --latitude arg                     Latitude of the interpolant. Default is degrees, minutes and
+                                     seconds (dd.mmssss).
+  --longitude arg                    Longitude of the interpolant. Default is degrees, minutes and
+                                     seconds (dd.mmssss).
+
++ Text file interpolation options:
+  -r [ --direction ] arg             Conversion of heights:
+                                       0  Orthometric to ellipsoid (default)
+                                       1  Ellipsoid to orthometric
+
++ Export options:
+  --export-dna-geo-file              Create a DNA geoid file from interpolated geoid information.
+  --export-ntv2-asc-file             Export a binary NTv2 geoid file to ASCII (.asc) format.
+  --export-ntv2-gsb-file             Export an ASCII NTv2 geoid file to binary (.gsb) format.
+
++ Generic options:
+  --verbose-level arg                When importing geoid information into a project, print the
+                                     stations for which an N-value could not be interpolated to a
+                                     log (*.int) file.
+                                       0: No information (default)
+                                       1: Helpful information
+                                       2: Extended information
+  --quiet                            Suppresses all explanation of what geoid is doing unless an
+                                     error occurs
+  -v [ --version ]                   Display the current program version
+  -h [ --help ]                      Show this help message
+  --help-module arg                  Provide help for a specific help category.
+
+
+C:\Users\likdw00>reftran --help
++---------------------------------------------------------------------------
++ Title:        reftran - DynAdjust 2022.
++ Description:  Reference frame transformation software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:01:53 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ reftran usage:  reftran network-name [options]:
+
++ Standard options:
+  -p [ --project-file ] arg         Project file name. Full path to project file. If none
+                                    specified, a new file is created using input-folder and
+                                    network-name.
+  -n [ --network-name ] arg         Network name. User defined name for all output files. Default
+                                    is "network#".
+  -i [ --input-folder ] arg         Path containing all input files
+  -o [ --output-folder ] arg        Path for all output files
+  --binary-stn-file arg             Binary station file name. Overrides network name.
+  --binary-msr-file arg             Binary measurement file name. Overrides network name.
+
++ Transformation options:
+  -r [ --reference-frame ] arg      Target reference frame for all stations and datum-dependent
+                                    measurements.
+  -e [ --epoch ] arg                Projected date for the transformed stations and measurements.
+                                    arg is a dot delimited string "dd.mm.yyyy", or "today" if
+                                    today's date is required. If no date is supplied, the reference
+                                    epoch of the supplied reference frame will be used.
+  --plate-model-option arg          Plate motion model option.
+                                      0: Assume all stations are on the Australian plate (default)
+                                      1: Interpolate plate motion model parameters from a defined
+                                         set of global tectonic plates. For this option, a global
+                                         tectonic plate boundary file and corresponding Euler
+                                         pole parameters file must be provided.
+  -b [ --plate-boundary-file ] arg  Global tectonic plate boundaries.
+  -m [ --plate-pole-file ] arg      Euler pole parameters corresponding to the global tectonic
+                                    plate boundaries supplied with option --plate-boundary-file.
+
++ Export options:
+  --export-xml-files                Export transformed stations and measurements to DynaML
+                                    (DynAdjust XML) format.
+  --single-xml-file                 Create a single DynaML file for stations and measurements.
+  --export-dna-files                Export transformed stations and measurements to DNA STN and MSR
+                                    format.
+
++ Generic options:
+  --verbose-level arg               Give detailed information about what reftran is doing.
+                                      0: No information (default)
+                                      1: Helpful information
+                                      2: Extended information
+                                      3: Debug level information
+  --quiet                           Suppresses all explanation of what reftran is doing unless an
+                                    error occurs
+  -v [ --version ]                  Display the current program version
+  -h [ --help ]                     Show this help message
+  --help-module arg                 Provide help for a specific help category.
+
+
+C:\Users\likdw00>segment  --help
++---------------------------------------------------------------------------
++ Title:        segment - DynAdjust 2022.
++ Description:  Automated network segmentation software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:01:51 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ segment usage:  segment network-name [options]:
+
++ Standard options:
+  -p [ --project-file ] arg   Project file name. Full path to project file. If none specified, a
+                              new file is created using input-folder and network-name.
+  -n [ --network-name ] arg   Network name. User defined name for all input and output files.
+                              Default is "network#".
+  -i [ --input-folder ] arg   Path containing all input files
+  -o [ --output-folder ] arg  Path for all output files
+  --binary-stn-file arg       Binary station file name. Overrides network name.
+  --binary-msr-file arg       Binary measurement file name. Overrides network name.
+  --seg-file arg              Segmentation output file name. Overrides network name.
+
++ Configuration options:
+  --net-file                  Look for a .net file containing stations to be incorporated within
+                              the first block.
+  --starting-stns arg         Additional stations to be incorporated within the first block. arg is
+                              a comma delimited string "stn1, stn 2,stn3 , stn 4".
+  --min-inner-stns arg        Minimum number of inner stations within each block. Default is 5.
+  --max-block-stns arg        Threshold limit for maximum number of stations per block. Default is
+                              65.
+  --contiguous-blocks arg     Treatment of isolated networks:
+                                0: Isolated networks as individual blocks
+                                1: Force production of contiguous blocks (default)
+  --search-level arg          Level to which searches should be conducted to find stations with the
+                              lowest measurement count. Default is 0.
+  --test-integrity            Test the integrity of all output files.
+
++ Generic options:
+  --verbose-level arg         Give detailed information about what segment is doing.
+                                0: No information (default)
+                                1: Helpful information
+                                2: Extended information
+                                3: Debug level information
+  --quiet                     Suppresses all explanation of what segment is doing unless an error
+                              occurs
+  -v [ --version ]            Display the current program version
+  -h [ --help ]               Show this help message
+  --help-module arg           Provide help for a specific help category.
+
+
+C:\Users\likdw00>adjust --help
++---------------------------------------------------------------------------
++ Title:        adjust - DynAdjust 2022.
++ Description:  Geodetic network adjustment software
++ Version:      1.2.7, Release (64-bit)
++ Build:        Mar 29 2023, 10:02:04 (MSVC++ 1935)
++ Copyright:    (C) 2022 Geoscience Australia.
+                This software is released under the Apache License.
++ Contact:      geodesy@ga.gov.au
++---------------------------------------------------------------------------
+
++ adjust usage:  adjust network-name [options]:
+
++ Standard options:
+  -p [ --project-file ] arg    Project file containing all user options. If specified, all other
+                               options are ignored.
+  -n [ --network-name ] arg    Network name. User defined name for all input and output files.
+                               Default is "network#".
+  -i [ --input-folder ] arg    Path containing all input files
+  -o [ --output-folder ] arg   Path for all output files
+  --binary-stn-file arg        Binary station file name. Overrides network name.
+  --binary-msr-file arg        Binary measurement file name. Overrides network name.
+  --seg-file arg               Network segmentation file name. Overrides network name.
+  --comments arg               Comments about the adjustment. All comments are printed to the adj
+                               file.
+
++ Adjustment mode options:
+  --simultaneous-adjustment    Simultaneous adjustment mode. The default mode.
+  --phased-adjustment          Sequential phased adjustment mode.
+  --report-results             Reproduce the adjustment output files without performing an
+                               adjustment.
+
++ Phased adjustment options:
+  --staged-adjustment          Store adjustment matrices in memory mapped files instead of
+                               retaining data in memory.  This option decreases efficiency but may
+                               be required if there is insufficient RAM to hold an adjustment in
+                               memory.
+  --multi-thread               Process forward, reverse and combination adjustments concurrently
+                               using all available CPU cores.
+  --block1-phased              Sequential phased adjustment mode resulting in rigorous estimates
+                               for block 1 only.
+
++ Configuration options:
+  --conf-interval arg          Confidence interval for testing the least squares solution and
+                               measurement corrections. Default is 95.0%.
+  --iteration-threshold arg    Least squares iteration threshold. Default is 0.0005m.
+  --max-iterations arg         Maximum number of iterations. Default is 10.
+  --constraints arg            Station constraints. arg is a comma delimited string
+                               "stn1,CCC,stn2,CCF" defining specific station constraints. These
+                               constraints override those contained in the station file.
+  --free-stn-sd arg            A-priori standard deviation for free stations. Default is 10m.
+  --fixed-stn-sd arg           A-priori standard deviation for fixed stations. Default is
+                               0.000001m.
+  --scale-normals-to-unity     Scale adjustment normal matrices to unity prior to computing inverse
+                               to minimise loss of precision caused by tight variances placed on
+                               constraint stations.
+  --type-b-sd-global arg       Type b uncertainties to be added to each computed uncertainty. arg
+                               is a comma delimited string that provides 1D, 2D or 3D uncertainties
+                               in the local reference frame (e.g. "up" or "e,n" or "e,n,up").
+  --type-b-sd-file arg         Type b uncertainties file name. Full path to a file containing Type
+                               b uncertainties to be added to the computed uncertainty for specific
+                               sites.
+
++ Stage adjustment options:
+  --create-stage-files         Recreate memory mapped files.
+  --purge-stage-files          Purge memory mapped files from disk upon adjustment completion.
+
++ Output options:
+  --output-msr-to-stn          Output summary of measurements connected to each station.
+  --sort-msr-to-stn-field arg  Sort order for measurement to stations summary.
+                                 0: Original station order (default)
+                                 1: Measurement count
+  --output-iter-adj-stn        Output adjusted station coordinates on each iteration.
+  --output-iter-adj-stat       Output statistical summary on each iteration.
+  --output-iter-adj-msr        Output adjusted measurements on each iteration.
+  --output-iter-cmp-msr        Output computed measurements on each iteration.
+  --output-adj-msr             Output final adjusted measurements.
+  --output-adj-gnss-units arg  Units for adjusted GNSS baseline measurements in the .adj file.
+                                 0: As measured (default)
+                                 1: Local [east, north, up]
+                                 2: Polar [azimuth, vert. angle, slope dist]
+                                 3: Polar [azimuth, slope dist, up]
+  --output-tstat-adj-msr       Output t-statistics for adjusted measurements.
+  --output-database-ids        Output measurement and cluster ids for database mapping.
+  --output-ignored-msrs        Output adjusted measurement statistics for ignored measurements.
+  --sort-adj-msr-field arg     Sort order for adjusted measurements.
+                                 0: Original input file order (default)
+                                 1: Measurement type
+                                 2: Station 1
+                                 3: Station 2
+                                 4: Measurement value
+                                 5: Correction
+                                 6: Adjusted std. dev.
+                                 7: N-statistic
+                                 8: Suspected outlier
+  --output-stn-blocks          For phased adjustments, output adjusted coordinates according to
+                               each block.
+  --output-msr-blocks          For phased adjustments, output adjusted measurements according to
+                               each block.
+  --sort-stn-orig-order        Output station information using the station order in the original
+                               station file. By default, stations are output in alpha-numeric
+                               order.
+  --stn-coord-types arg        Output station coordinate types. arg is a case-sensitive string of
+                               chars "ENzPLHhXYZ" defining the specific types to be printed.
+                               Default is PLHhXYZ.
+  --angular-stn-type arg       Output type for angular station coordinates.
+                                 0: Degrees, minutes and seconds (default)
+                                 1: Decimal degrees
+  --stn-corrections            Output station corrections with adjusted station coordinates.
+  --precision-stn-linear arg   Output precision for linear station coordinates in metres. Default
+                               is 4
+  --precision-stn-angular arg  Output precision for angular station coordinates. For values in
+                               degrees, minutes and seconds, precision relates to seconds. For
+                               values in decimal degrees, precision relates to degrees. Default is
+                               5
+  --precision-msr-linear arg   Output precision for linear measurements in metres. Default is 4
+  --precision-msr-angular arg  Output precision for angular measurements. For values in degrees,
+                               minutes and seconds, precision relates to seconds. For values in
+                               decimal degrees, precision relates to degrees. Default is 4
+  --angular-msr-type arg       Output type for angular measurements.
+                                 0: Degrees, minutes and seconds (default)
+                                 1: Decimal degrees
+  --dms-msr-format arg         Output format for angular (dms) measurements.
+                                 0: Separated fields (default)
+                                 1: Separated fields with symbols
+                                 2: HP notation
+
++ Export options:
+  --output-pos-uncertainty     Output positional uncertainty and variances of adjusted station
+                               coordinates to .apu file.
+  --output-all-covariances     Output covariances between adjusted station coordinates to .apu
+                               file.
+  --output-apu-vcv-units arg   Variance matrix units in the .apu file.
+                                 0: Cartesian [X,Y,Z] (default)
+                                 1: Local [e,n,up]
+  --output-corrections-file    Output corrections (azimuth, distance, e, n, up) to initial station
+                               coordinates to .cor file.
+  --hz-corr-threshold arg      Minimum horizontal threshold by which to restrict output of station
+                               corrections to .cor file. Default is 0.0m
+  --vt-corr-threshold arg      Minimum vertical threshold by which to restrict output of station
+                               corrections to .cor file. Default is 0.0m
+  --export-xml-stn-file        Export estimated station coordinates to DynaML (DynAdjust XML)
+                               station file.
+  --export-xml-msr-file        Export estimated station coordinates and uncertainties to DynaML
+                               (DynAdjust XML) measurement file as a GNSS Y cluster.
+  --export-dna-stn-file        Export estimated station coordinates to DNA station file.
+  --export-dna-msr-file        Export estimated station coordinates and uncertainties to DNA
+                               measurement file as a GNSS Y cluster.
+  --export-sinex-file          Export estimated station coordinates and full variance matrix to
+                               SINEX file. Note: station names will be truncated to four characters
+                               as per the SINEX standard.
+
++ Generic options:
+  --verbose-level arg          Give detailed information about what adjust is doing.
+                                 0: No information (default)
+                                 1: Helpful information
+                                 2: Extended information
+                                 3: Debug level information
+  --quiet                      Suppresses all explanation of what adjust is doing unless an error
+                               occurs
+  -v [ --version ]             Display the current program version
+  -h [ --help ]                Show this help message
+  --help-module arg            Provide help for a specific help category.
