@@ -9,9 +9,7 @@ from __future__ import annotations
 import argparse
 import math
 import os
-import re
 import sqlite3
-import sys
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -179,6 +177,9 @@ def msr_xml2db(f: str | os.PathLike[str], db: str | os.PathLike[str]) -> None:
     measurements = _as_list(xml["DnaXmlFormat"].get("DnaMeasurement"))
     with _connect(db) as conn:
         for measurement in measurements:
+            if measurement['Type'] == 'X':
+                continue
+                # TODO add capability for clusters
             base_record: dict[str, Any] = {}
             for key, value in measurement.items():
                 if key == "Directions":
@@ -193,7 +194,7 @@ def msr_xml2db(f: str | os.PathLike[str], db: str | os.PathLike[str]) -> None:
                             f"({', '.join('?' for _ in columns)})",
                             [None, *target.values()],
                         )
-                elif key in {"GPSBaseline", "Clusterpoint"}:
+                elif key == "GPSBaseline" and measurement['Type'] == 'G':
                     child = {"MEASUREMENT_ID": None, **value}
                     _insert(conn, "DNA_BASELINES", child)
                 else:
@@ -201,14 +202,18 @@ def msr_xml2db(f: str | os.PathLike[str], db: str | os.PathLike[str]) -> None:
             if base_record:
                 _insert(conn, "DNA_MEASUREMENT", base_record)
                 measurement_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
-                conn.execute(
-                    "UPDATE DNA_DIRECTIONS SET MEASUREMENT_ID = ? "
-                    "WHERE MEASUREMENT_ID IS NULL", (measurement_id,)
-                )
-                conn.execute(
-                    "UPDATE DNA_BASELINES SET MEASUREMENT_ID = ? "
-                    "WHERE MEASUREMENT_ID IS NULL", (measurement_id,)
-                )
+                if key == "Directions":
+                    add_tbl_clm("DNA_DIRECTIONS", ["MEASUREMENT_ID"], conn)
+                    conn.execute(
+                        "UPDATE DNA_DIRECTIONS SET MEASUREMENT_ID = ? "
+                        "WHERE MEASUREMENT_ID IS NULL", (measurement_id,)
+                    )
+                elif measurement['Type'] == 'G':
+                    add_tbl_clm("DNA_BASELINES", ["MEASUREMENT_ID"], conn)
+                    conn.execute(
+                        "UPDATE DNA_BASELINES SET MEASUREMENT_ID = ? "
+                        "WHERE MEASUREMENT_ID IS NULL", (measurement_id,)
+                    )
         add_file_ref(f, "DNA_MEASUREMENT", conn)
         add_file_ref(f, "DNA_DIRECTIONS", conn)
         add_file_ref(f, "DNA_BASELINES", conn)
